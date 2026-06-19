@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funnel Master SOP — HBAI Team</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#f5f5f7;--surface:#ffffff;--s2:#f0f0f3;--border:#e0e0e8;
+    --text:#111118;--muted:#70708a;
+    --p:#5b4de8;--pm:rgba(91,77,232,.1);
+    --o:#c95e2e;--om:rgba(201,94,46,.1);
+    --g:#2e8a5a;--gm:rgba(46,138,90,.1);
+    --y:#a07800;--ym:rgba(160,120,0,.1);
+    --r:#c0393d;--rm:rgba(192,57,61,.1);
+    --t:#1e9a84;--tm:rgba(30,154,132,.1);
+    --rad:10px;--rads:6px;
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:1.6;min-height:100vh}
+  a{color:var(--p);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--s2);padding:1px 6px;border-radius:4px;color:var(--t);border:1px solid var(--border)}
+
+  /* LAYOUT */
+  .layout{display:flex;min-height:100vh;max-width:1240px;margin:0 auto}
+
+  /* SIDEBAR */
+  .sidebar{width:256px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:24px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .sb-head{padding:0 18px 18px;border-bottom:1px solid var(--border);margin-bottom:12px}
+  .sb-badge{background:var(--pm);color:var(--p);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:20px;display:inline-block;margin-bottom:6px}
+  .sb-title{font-size:14px;font-weight:700;line-height:1.3}
+  .prog-wrap{padding:0 18px 14px;border-bottom:1px solid var(--border);margin-bottom:10px}
+  .prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px}
+  .prog-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+  .prog-fill{height:100%;background:linear-gradient(90deg,var(--p),var(--o));border-radius:2px;transition:width .4s ease;width:0}
+  .nav-phase{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:10px 18px 3px;opacity:.55}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:7px 18px;font-size:12.5px;font-weight:500;color:var(--muted);text-decoration:none;transition:color .15s,background .15s;cursor:pointer}
+  .nav-item:hover{background:var(--s2);color:var(--text)}
+  .nav-item.active{color:var(--p);background:var(--pm)}
+  .nav-item .ni{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+  .nav-item .nc{margin-left:auto;font-size:11px;color:var(--g);opacity:0;transition:opacity .2s}
+  .nav-item.done .nc{opacity:1}
+  .nav-div{margin:8px 18px;border:none;border-top:1px solid var(--border)}
+
+  /* MAIN */
+  .main{flex:1;padding:0 44px 80px;min-width:0}
+
+  /* TOP BAR */
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 0 0}
+  .btn-reset{background:var(--s2);border:1px solid var(--border);color:var(--muted);font-family:inherit;font-size:12px;font-weight:500;padding:5px 13px;border-radius:var(--rads);cursor:pointer;transition:color .15s,border-color .15s}
+  .btn-reset:hover{color:var(--text);border-color:var(--muted)}
+
+  /* HERO */
+  .hero{margin:28px 0 36px;padding-bottom:28px;border-bottom:1px solid var(--border)}
+  .eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--p);margin-bottom:10px}
+  .hero h1{font-size:28px;font-weight:700;line-height:1.2;margin-bottom:10px}
+  .hero p{color:var(--muted);font-size:14.5px;line-height:1.7;max-width:600px}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+  .tag{font-size:11.5px;font-weight:500;padding:3px 10px;border-radius:20px;border:1px solid var(--border);color:var(--muted);background:var(--surface)}
+
+  /* PHASE DIVIDER */
+  .phase-divider{display:flex;align-items:center;gap:14px;margin:48px 0 28px;scroll-margin-top:80px}
+  .phase-badge{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--border);border-radius:var(--rad);padding:10px 16px;flex-shrink:0}
+  .phase-badge .ph-icon{font-size:18px}
+  .phase-badge .ph-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .phase-badge .ph-title{font-size:15px;font-weight:700;color:var(--text)}
+  .phase-line{flex:1;height:1px;background:var(--border)}
+  .phase-divider.p{border-left:3px solid var(--p);padding-left:12px;border-radius:0 var(--rads) var(--rads) 0;background:var(--pm)}
+  .phase-divider.o{border-left:3px solid var(--o);background:var(--om)}
+  .phase-divider.g{border-left:3px solid var(--g);background:var(--gm)}
+  .phase-divider.t{border-left:3px solid var(--t);background:var(--tm)}
+  .phase-divider.y{border-left:3px solid var(--y);background:var(--ym)}
+
+  /* SECTION */
+  .section{margin-bottom:40px;scroll-margin-top:80px}
+  .sec-hdr{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+  .sec-letter{width:36px;height:36px;border-radius:var(--rads);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:'JetBrains Mono',monospace;flex-shrink:0;background:var(--pm);color:var(--p)}
+  .sec-letter.o{background:var(--om);color:var(--o)}
+  .sec-letter.g{background:var(--gm);color:var(--g)}
+  .sec-letter.y{background:var(--ym);color:var(--y)}
+  .sec-letter.t{background:var(--tm);color:var(--t)}
+  .sec-letter.r{background:var(--rm);color:var(--r)}
+  .sec-info h3{font-size:16px;font-weight:700;margin-bottom:3px}
+  .sec-info p{font-size:12.5px;color:var(--muted);line-height:1.5}
+
+  /* CALLOUT */
+  .callout{border-left:3px solid var(--p);background:var(--pm);border-radius:0 var(--rads) var(--rads) 0;padding:12px 16px;margin-bottom:16px;font-size:13.5px;line-height:1.6}
+  .callout.warn{border-color:var(--y);background:var(--ym)}
+  .callout.danger{border-color:var(--r);background:var(--rm)}
+  .callout.ok{border-color:var(--g);background:var(--gm)}
+  .callout.teal{border-color:var(--t);background:var(--tm)}
+  .callout.orange{border-color:var(--o);background:var(--om)}
+  .callout strong{font-weight:600}
+
+  /* CHECKLIST */
+  .cl{background:var(--surface);border:1px solid var(--border);border-radius:var(--rad);overflow:hidden;margin-bottom:12px}
+  .cl-hdr{padding:9px 16px;background:var(--s2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .cl-hdr span{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .cl-count{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+  .ci{display:flex;align-items:flex-start;gap:11px;padding:11px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
+  .ci:last-child{border-bottom:none}
+  .ci:hover{background:var(--s2)}
+  .ci.checked{opacity:.45}
+  .ci input[type=checkbox]{appearance:none;-webkit-appearance:none;width:17px;height:17px;border:2px solid var(--border);border-radius:4px;flex-shrink:0;margin-top:2px;cursor:pointer;transition:background .15s,border-color .15s;position:relative}
+  .ci input[type=checkbox]:checked{background:var(--p);border-color:var(--p)}
+  .ci input[type=checkbox]:checked::after{content:'';position:absolute;left:4px;top:1px;width:5px;height:9px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(45deg)}
+  .ci-text{flex:1;font-size:13.5px;line-height:1.5;color:var(--text);user-select:none}
+  .ci-text .why{display:block;font-size:12px;color:var(--muted);margin-top:2px;font-style:italic}
+
+  /* COLLAPSIBLE BLOCK */
+  .blk{background:var(--surface);border:1px solid var(--border);border-radius:var(--rad);overflow:hidden;margin-bottom:12px}
+  .blk-hdr{padding:11px 16px;background:var(--s2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+  .blk-hdr .bicon{font-size:15px}
+  .blk-hdr h4{font-size:13px;font-weight:600;flex:1}
+  .blk-hdr .btog{font-size:11px;color:var(--muted);transition:transform .2s}
+  .blk-hdr.collapsed .btog{transform:rotate(-90deg)}
+  .blk-body{}
+
+  /* DO NOT */
+  .dont{background:rgba(192,57,61,.06);border:1px solid rgba(192,57,61,.25);border-radius:var(--rad);overflow:hidden;margin-top:10px}
+  .dont-hdr{padding:7px 14px;background:rgba(192,57,61,.12);border-bottom:1px solid rgba(192,57,61,.15);font-size:11px;font-weight:700;color:var(--r);text-transform:uppercase;letter-spacing:.06em}
+  .dont-item{display:flex;align-items:flex-start;gap:9px;padding:9px 14px;border-bottom:1px solid rgba(192,57,61,.1);font-size:13px;color:var(--text)}
+  .dont-item:last-child{border-bottom:none}
+  .dont-item::before{content:'✕';color:var(--r);font-size:11px;margin-top:2px;flex-shrink:0}
+
+  /* COPY BLOCK */
+  .copy-block{background:var(--s2);border:1px solid var(--border);border-radius:var(--rads);padding:12px 14px;font-size:12.5px;line-height:1.7;color:var(--muted);margin:8px 0 14px;font-family:'JetBrains Mono',monospace;white-space:pre-wrap}
+
+  /* FLOW STRIP */
+  .flow{display:flex;align-items:stretch;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:var(--rad);overflow:hidden;margin-bottom:24px}
+  .flow-step{flex:1;min-width:80px;padding:12px 10px;text-align:center;border-right:1px solid var(--border)}
+  .flow-step:last-child{border-right:none}
+  .fs-num{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+  .fs-icon{font-size:17px;margin-bottom:3px}
+  .fs-name{font-size:11px;font-weight:600;color:var(--text)}
+
+  /* OVERVIEW CARDS */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:24px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rad);padding:14px}
+  .card .ci{font-size:19px;margin-bottom:7px;display:block;border:none;padding:0;cursor:default}
+  .card .ci:hover{background:none}
+  .card h4{font-size:12.5px;font-weight:700;margin-bottom:3px}
+  .card p{font-size:11.5px;color:var(--muted);line-height:1.5}
+
+  /* TOOLS */
+  .tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+  .tool{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-size:12.5px;font-weight:500}
+
+  /* RESPONSIVE */
+  @media(max-width:768px){
+    .layout{flex-direction:column}
+    .sidebar{width:100%;height:auto;position:static;border-right:none;border-bottom:1px solid var(--border)}
+    .main{padding:0 16px 40px}
+    .hero h1{font-size:22px}
+    .flow{flex-direction:column}
+    .flow-step{border-right:none;border-bottom:1px solid var(--border)}
+    .flow-step:last-child{border-bottom:none}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar">
+  <div class="sb-head">
+    <div class="sb-badge">HBAI Team</div>
+    <div class="sb-title">Funnel Master SOP</div>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-label"><span>Overall Progress</span><span id="progText">0 / 0</span></div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+  </div>
+
+  <div class="nav-phase">Phase 1 — Pre-Build</div>
+  <a class="nav-item" href="#p1-readiness"><span class="ni">✅</span> Readiness Check <span class="nc">✓</span></a>
+
+  <div class="nav-div"></div>
+  <div class="nav-phase">Phase 2 — Build</div>
+  <a class="nav-item" href="#p2-global"><span class="ni">📐</span> Global Page Rules <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p2-landing"><span class="ni">📋</span> Landing Page <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p2-webinar"><span class="ni">🎥</span> Webinar Page <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p2-order"><span class="ni">🛒</span> Order Page <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p2-retarget"><span class="ni">🔁</span> Retargeting Page <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p2-bonus"><span class="ni">🎁</span> Bonus Resource <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p2-scheduler"><span class="ni">📅</span> Scheduler Page <span class="nc">✓</span></a>
+
+  <div class="nav-div"></div>
+  <div class="nav-phase">Phase 3 — Launch Assets</div>
+  <a class="nav-item" href="#p3-program"><span class="ni">📄</span> Program Breakdown <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p3-agreement"><span class="ni">📝</span> Client Agreement <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p3-automations"><span class="ni">⚙️</span> Automations <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p3-forms"><span class="ni">🔗</span> Form Links <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p3-customvalues"><span class="ni">🔧</span> Custom Values <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p3-docs"><span class="ni">📁</span> Docs & Drive Links <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p3-notify"><span class="ni">💬</span> Notify Strategist <span class="nc">✓</span></a>
+
+  <div class="nav-div"></div>
+  <div class="nav-phase">Phase 4 — GHL Specialist Review</div>
+  <a class="nav-item" href="#p4-domains"><span class="ni">🌐</span> Domains & URLs <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p4-tracking"><span class="ni">📡</span> Pixel & Tracking <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p4-payment"><span class="ni">💳</span> Payment <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p4-email"><span class="ni">📮</span> Email Sending <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p4-scoreapp"><span class="ni">📊</span> ScoreApp <span class="nc">✓</span></a>
+  <a class="nav-item" href="#p4-templates"><span class="ni">✉️</span> SMS & Email Templates <span class="nc">✓</span></a>
+
+  <div class="nav-div"></div>
+  <div class="nav-phase">Phase 5 — Go-Live</div>
+  <a class="nav-item" href="#p5-testing"><span class="ni">🧪</span> Final Testing <span class="nc">✓</span></a>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<main class="main">
+
+  <div class="topbar">
+    <div></div>
+    <button class="btn-reset" onclick="resetAll()">↺ Reset All Checkboxes</button>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="eyebrow">HBAI Team · Master SOP</div>
+    <h1>Funnel Build & Launch SOP</h1>
+    <p>One end-to-end process covering every step from initial build through BI review and ad launch. Follow phases in order — each phase hands off to the next.</p>
+    <div class="tags">
+      <span class="tag">VA Build</span>
+      <span class="tag">Launch Assets</span>
+      <span class="tag">BI Review</span>
+      <span class="tag">GHL / GoHighLevel</span>
+      <span class="tag">Pre-Launch</span>
+    </div>
+  </div>
+
+  <!-- FLOW STRIP -->
+  <div class="flow">
+    <div class="flow-step"><div class="fs-num">Phase 1</div><div class="fs-icon">✅</div><div class="fs-name">Pre-Build</div></div>
+    <div class="flow-step"><div class="fs-num">Phase 2</div><div class="fs-icon">🏗️</div><div class="fs-name">Build</div></div>
+    <div class="flow-step"><div class="fs-num">Phase 3</div><div class="fs-icon">🚀</div><div class="fs-name">Launch Assets</div></div>
+    <div class="flow-step"><div class="fs-num">Phase 4</div><div class="fs-icon">🔍</div><div class="fs-name">GHL Specialist Review</div></div>
+    <div class="flow-step"><div class="fs-num">Phase 5</div><div class="fs-icon">🟢</div><div class="fs-name">Go-Live</div></div>
+  </div>
+
+  <div class="callout teal"><strong>📺 Reference:</strong> A <a href="https://www.loom.com/share/2d27635f1b91475dbfc38239cbe79e50" target="_blank">Loom walkthrough video</a> is available for the Launch Assets phase. <strong>Tools used:</strong> GoHighLevel · Vidalytics · Gamma (bonus guides) · Canva (only if explicitly instructed) · Google Drive</div>
+
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- PHASE 1 — PRE-BUILD                     -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="phase-divider p" id="phase1">
+    <div><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--p);margin-bottom:2px">Phase 1</div><div style="font-size:16px;font-weight:700">Pre-Build</div></div>
+  </div>
+
+  <div class="section" id="p1-readiness">
+    <div class="sec-hdr">
+      <div class="sec-letter">A</div>
+      <div class="sec-info"><h3>Readiness Check</h3><p>Confirm everything is in place before touching the funnel.</p></div>
+    </div>
+    <div class="callout warn"><strong>⚠️ Don't skip this.</strong> You will be notified after the client's Tech Setup Form is completed — this contains the calendar details and funnel notes you need. For past clients, confirm a calendar still exists and is connected to the practitioner.</div>
+    <div class="cl" data-section="p1-readiness">
+      <div class="cl-hdr"><span>Pre-Build Checks</span><span class="cl-count">0 / 5</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">CRM call has been completed with the client</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Tech Setup Form has been completed<span class="why">This contains calendar details and any funnel-specific notes.</span></div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Client's program/offer is finalized</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Client is in the correct ClickUp stage for this work</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">For past clients: calendar still exists and is connected to the practitioner</div></label>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- PHASE 2 — BUILD                         -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="phase-divider o" id="phase2">
+    <div><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--o);margin-bottom:2px">Phase 2</div><div style="font-size:16px;font-weight:700">Funnel Build</div></div>
+  </div>
+
+  <!-- GLOBAL PAGE RULES -->
+  <div class="section" id="p2-global">
+    <div class="sec-hdr">
+      <div class="sec-letter o">B</div>
+      <div class="sec-info"><h3>Global Page Rules</h3><p>These apply to every page you build. Check them here once — don't repeat per page.</p></div>
+    </div>
+    <div class="cl" data-section="p2-global">
+      <div class="cl-hdr"><span>All Pages — Every Time</span><span class="cl-count">0 / 4</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">SEO metadata (title + description) reviewed and matches the client on every page</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">All popups disabled on every page</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Mobile layout reviewed and clean on every page</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">No placeholder text or images remain on any page</div></label>
+    </div>
+  </div>
+
+  <!-- STEP 1: LANDING PAGE -->
+  <div class="section" id="p2-landing">
+    <div class="sec-hdr">
+      <div class="sec-letter o">C</div>
+      <div class="sec-info"><h3>Landing / Opt-In Page</h3><p>Build the opt-in page so leads can register for the free class.</p></div>
+    </div>
+    <div class="cl" data-section="p2-landing">
+      <div class="cl-hdr"><span>Landing Page Build</span><span class="cl-count">0 / 10</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Correct funnel template is being used</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Provided headline and sub-headline added</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Correct client form inserted — inline, not a popup<span class="why">Do not use a template default form.</span></div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Phone field set to OPTIONAL with label "Phone (optional)"</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Terms & conditions / privacy policy removed — replaced with consent copy starting "By clicking agree..." (see below)<span class="why">Conditional logic: If Phone is Filled → Show Field: T&Cs</span></div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Form CTA references joining the free class; form submission set to "Go to Next Step"</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Bottom CTA is outcome-based (not generic "Submit")</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Top banner added referencing the free class</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Scroll button navigates to the correct section</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Practitioner photo and bio added (confirmed correct person); testimonials in place</div></label>
+    </div>
+    <div style="margin-top:10px">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Required Consent Copy (replaces T&C)</div>
+      <div class="copy-block">By clicking agree, you consent to receive promotional messaging via email, calls, and SMS including autodialed calls and messages. Opt-out anytime.</div>
+    </div>
+    <div class="dont">
+      <div class="dont-hdr">✕ Do Not</div>
+      <div class="dont-item">Add extra copy not provided by the client</div>
+      <div class="dont-item">Add bundle graphics</div>
+    </div>
+  </div>
+
+  <!-- STEP 2: WEBINAR PAGE -->
+  <div class="section" id="p2-webinar">
+    <div class="sec-hdr">
+      <div class="sec-letter y">D</div>
+      <div class="sec-info"><h3>Webinar Page + Vidalytics Setup</h3><p>Upload and configure the webinar video in Vidalytics, then embed it. Both build and review settings are covered here.</p></div>
+    </div>
+    <div class="callout"><strong>💡 What is Vidalytics?</strong> The video hosting platform for webinars. It tracks watch milestones and triggers automations at 25%, 50%, 75%, and 100% watched.</div>
+
+    <div class="blk">
+      <div class="blk-hdr" onclick="toggleBlk(this)"><span class="bicon">🎬</span><h4>Vidalytics Configuration</h4><span class="btog">▾</span></div>
+      <div class="blk-body">
+        <div class="cl" data-section="p2-vidalytics">
+          <div class="cl-hdr"><span>Video Settings</span><span class="cl-count">0 / 10</span></div>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Log in to Vidalytics Agency account → find client sub-account → upload webinar video</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Autoplay: OFF</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Full-screen: ON</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Rewind: OFF</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Captions: generated and published</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Progress bar: ON</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Seek bar navigation: OFF<span class="why">Prevents viewers from skipping ahead.</span></div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Play and progress bar colors updated to match client branding</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Vidalytics integrated to the correct GHL sub-account</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Tags created for 25%, 50%, 75%, and 100% watch milestones; all changes published</div></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-hdr" onclick="toggleBlk(this)"><span class="bicon">📄</span><h4>Webinar Page Build</h4><span class="btog">▾</span></div>
+      <div class="blk-body">
+        <div class="cl" data-section="p2-webinar-page">
+          <div class="cl-hdr"><span>Page Setup</span><span class="cl-count">0 / 6</span></div>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Video block added → Custom Embed → Vidalytics embed code pasted in</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">CTA button added and linked to the Order Page</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">5-minute countdown timer added — shows CTA button when it expires</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Timer hides/shows correct sections at the right times</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Text-only testimonials added, or section hidden if none provided</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Page moves to the correct next step after the webinar</div></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="dont">
+      <div class="dont-hdr">✕ Do Not</div>
+      <div class="dont-item">Use YouTube, Vimeo, or any non-Vidalytics embed</div>
+      <div class="dont-item">Use video testimonials</div>
+    </div>
+  </div>
+
+  <!-- STEP 3: ORDER PAGE -->
+  <div class="section" id="p2-order">
+    <div class="sec-hdr">
+      <div class="sec-letter o">E</div>
+      <div class="sec-info"><h3>Order Page</h3><p>Critical step. Offer stack, product, pricing, and coupon must all be exactly right.</p></div>
+    </div>
+    <div class="callout danger"><strong>🚨 Critical:</strong> If a product is not attached to the order form, the page is not complete. Do not mark this done or submit to BI without it.</div>
+
+    <div class="blk">
+      <div class="blk-hdr" onclick="toggleBlk(this)"><span class="bicon">📦</span><h4>Offer Stack — Must Match Exactly</h4><span class="btog">▾</span></div>
+      <div class="blk-body">
+        <div class="cl" data-section="p2-order-offer">
+          <div class="cl-hdr"><span>Offer Stack — In This Order</span><span class="cl-count">0 / 4</span></div>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">1. One-to-one / Consultation listed at the top</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">2. Health History Form listed</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">3. Custom Assessment listed</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">4. Bonus guide listed at the bottom</div></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-hdr" onclick="toggleBlk(this)"><span class="bicon">💳</span><h4>Product, Pricing & Coupon</h4><span class="btog">▾</span></div>
+      <div class="blk-body">
+        <div class="cl" data-section="p2-order-product">
+          <div class="cl-hdr"><span>Checkout Setup</span><span class="cl-count">0 / 8</span></div>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Product created in GHL at $67 with coupon code <code>RESET10</code> (10% off) unless otherwise specified</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Product attached to the order form</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Payment processor integrated (Stripe or equivalent)</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Coupon toggle enabled in order form; coupon code created in GHL</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Banner or copy referencing the coupon added to the page</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Checkout button does NOT say anything about "free"</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">CTA button scrolls to checkout; bottom CTA is outcome-based</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">On mobile: checkout form appears below the offer stack descriptions</div></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="dont">
+      <div class="dont-hdr">✕ Do Not</div>
+      <div class="dont-item">Add bundle graphics unless explicitly approved (professional mockups only if approved)</div>
+    </div>
+  </div>
+
+  <!-- STEP 3B: RETARGETING -->
+  <div class="section" id="p2-retarget">
+    <div class="sec-hdr">
+      <div class="sec-letter g">F</div>
+      <div class="sec-info"><h3>Retargeting Order Page</h3><p>A duplicate of the order page with a deeper discount code used for retargeting ads only.</p></div>
+    </div>
+    <div class="cl" data-section="p2-retarget">
+      <div class="cl-hdr"><span>Retargeting Page Setup</span><span class="cl-count">0 / 5</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Order page duplicated in the funnel (place at the end)</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Duplicate renamed to "Order (Retargeting)"</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Same product attached; page connects to the scheduler page</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">New coupon code <code>EXCLUSIVE25</code> created (fixed 25% off)</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Top banner reads: "Use code EXCLUSIVE25 to get 25% off"</div></label>
+    </div>
+  </div>
+
+  <!-- STEP 4: BONUS RESOURCE -->
+  <div class="section" id="p2-bonus">
+    <div class="sec-hdr">
+      <div class="sec-letter y">G</div>
+      <div class="sec-info"><h3>Bonus Resource</h3><p>Set up the bonus guide and the automation that delivers it on purchase.</p></div>
+    </div>
+    <div class="cl" data-section="p2-bonus">
+      <div class="cl-hdr"><span>Bonus Setup</span><span class="cl-count">0 / 5</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Bonus guide downloaded from client's Drive: <em>[Last Name] V1 Bonus Deliverable</em></div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Bonus guide uploaded to GHL media area</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">iPad ecover mockup created using the guide's cover image</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Bonus delivery email created with link to the guide from the media area</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Automation set up to deliver bonus on consult purchase (added to Lead Gen Pipeline: Consult Purchased)</div></label>
+    </div>
+    <div style="margin-top:10px">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Bonus Email Template</div>
+      <div class="copy-block">Subject: [BONUS] Here is Your [Download Name]
+
+Hey {{contact.first_name}},
+
+Congratulations on getting the [Download Name]! Click the button below to download.
+
+[Title of Download]
+
+Thanks,
+[Client Name]</div>
+    </div>
+  </div>
+
+  <!-- STEP 5: SCHEDULER -->
+  <div class="section" id="p2-scheduler">
+    <div class="sec-hdr">
+      <div class="sec-letter o">H</div>
+      <div class="sec-info"><h3>Scheduler / Thank You Page</h3><p>Set up the calendar and page so purchased consults can be booked immediately.</p></div>
+    </div>
+    <div class="callout"><strong>📋 Use the Funnel Build Questionnaire</strong> for calendar details: availability, timezone, meeting duration, and location.</div>
+    <div class="cl" data-section="p2-scheduler">
+      <div class="cl-hdr"><span>Scheduler Page Setup</span><span class="cl-count">0 / 7</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Thank-you headline updated to match the product name</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Calendar created and named using the custom value <code>{{custom_values.calendar_name}}</code></div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Custom value updated to the actual name of the call/assessment</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Calendar set up as Round Robin<span class="why">Allows additional practitioners to be added easily later.</span></div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Calendar element added to page and newly created calendar attached</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Meeting location set and confirmed correct</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Offer name on scheduler matches the order page exactly</div></label>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- PHASE 3 — LAUNCH ASSETS                 -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="phase-divider t" id="phase3">
+    <div><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t);margin-bottom:2px">Phase 3</div><div style="font-size:16px;font-weight:700">Launch Assets</div></div>
+  </div>
+  <div class="callout teal"><strong>📌 Trigger:</strong> Business Integrators notify you via Slack with a Loveable link once the program breakdown page is complete. That message is your signal to start this phase.</div>
+
+  <!-- PROGRAM BREAKDOWN -->
+  <div class="section" id="p3-program">
+    <div class="sec-hdr">
+      <div class="sec-letter t">I</div>
+      <div class="sec-info"><h3>Program Breakdown Page</h3><p>Connect the program breakdown page to the client's GHL account and one sheeter.</p></div>
+    </div>
+    <div class="callout warn"><strong>⚠️ Keep the program breakdown page open</strong> for the next step — you'll pull pricing, program name, and length from it to fill the client agreement.</div>
+    <div class="cl" data-section="p3-program">
+      <div class="cl-hdr"><span>Program Breakdown Setup</span><span class="cl-count">0 / 3</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Grab the link from Slack → GHL Settings → Custom Values → paste into the Program Breakdown link field</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Go to funnel pages → find the program breakdown page → attach the same domain as the client's funnel</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Copy the program breakdown page link into the client's one sheeter template</div></label>
+    </div>
+  </div>
+
+  <!-- CLIENT AGREEMENT -->
+  <div class="section" id="p3-agreement">
+    <div class="sec-hdr">
+      <div class="sec-letter g">J</div>
+      <div class="sec-info"><h3>Client Agreement</h3><p>Customize the service agreement template with this client's program details.</p></div>
+    </div>
+    <div class="cl" data-section="p3-agreement">
+      <div class="cl-hdr"><span>Agreement Setup</span><span class="cl-count">0 / 4</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Go to Payments → Documents & Contracts → Templates → open <strong>Health Business AI – Service Agreement Template</strong></div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Replace all <code>[bracketed fields]</code> with client specifics: program name, pricing, program length, etc.<span class="why">Review the entire document — don't miss any brackets.</span></div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">If client has their own agreement or clauses — weave them in or replace the template entirely</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Agreement saved and ready to be sent via automation</div></label>
+    </div>
+  </div>
+
+  <!-- AUTOMATIONS -->
+  <div class="section" id="p3-automations">
+    <div class="sec-hdr">
+      <div class="sec-letter y">K</div>
+      <div class="sec-info"><h3>Automations</h3><p>Set up the agreement automation, then verify all funnel automations are correctly configured.</p></div>
+    </div>
+    <div class="callout"><strong>💡 What to check in each automation:</strong> Correct trigger? Right form/calendar/product attached? Tags added AND removed correctly? Wait steps in place? People removed from conflicting workflows when they purchase?</div>
+
+    <div class="blk">
+      <div class="blk-hdr" onclick="toggleBlk(this)"><span class="bicon">📝</span><h4>Client Agreement Automation</h4><span class="btog">▾</span></div>
+      <div class="blk-body">
+        <div class="cl" data-section="p3-auto-agreement">
+          <div class="cl-hdr"><span>Agreement Trigger</span><span class="cl-count">0 / 3</span></div>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Open automation: <strong>Client Agreement Form Submitted</strong> → confirm it's triggered by the Client Agreement Form</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">In branch "If email is not empty" → add action: Send Documents & Contracts → select customized agreement → choose practitioner as sender</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Publish the automation</div></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-hdr" onclick="toggleBlk(this)"><span class="bicon">⚙️</span><h4>All Funnel Automations</h4><span class="btog">▾</span></div>
+      <div class="blk-body">
+        <div class="cl" data-section="p3-auto-funnel">
+          <div class="cl-hdr"><span>Automation Checklist</span><span class="cl-count">0 / 11</span></div>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Facebook Conversions API automations (Lead, Purchase, Schedule)</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Lead gen pipeline automations</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Webinar opt-in source workflow</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Webinar opt-in email sequence</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">No-show follow-up sequence</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Consult purchased workflow</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Consult scheduled workflow</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Consult canceled workflow</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Post-call workflow</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Bonus email delivery workflow</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Old/duplicate automations removed (e.g. old webinar engagement automation)</div></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM LINKS -->
+  <div class="section" id="p3-forms">
+    <div class="sec-hdr">
+      <div class="sec-letter t">L</div>
+      <div class="sec-info"><h3>Form Links</h3><p>Get direct links for both forms and add them to the client's one sheeter.</p></div>
+    </div>
+    <div class="cl" data-section="p3-forms">
+      <div class="cl-hdr"><span>Form Links</span><span class="cl-count">0 / 4</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Sites → Forms → open <strong>Client Agreement Form</strong> → Integrate → copy direct link → add to one sheeter and Email Nurture Sequence Flow doc</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Sites → Forms → Sales Call Forms folder → open <strong>Post-Close Form</strong> → Integrate → copy direct link → add to one sheeter and Email Nurture Sequence Flow doc</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Sales script link retrieved from client's Google Drive → add to one sheeter</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Email nurture flow link retrieved from client's Google Drive → add to one sheeter</div></label>
+    </div>
+    <div class="callout danger" style="margin-top:10px"><strong>🚨 All links must be LIVE links</strong> — not drafts, not restricted. Verify each one loads before adding it.</div>
+  </div>
+
+  <!-- CUSTOM VALUES -->
+  <div class="section" id="p3-customvalues">
+    <div class="sec-hdr">
+      <div class="sec-letter g">M</div>
+      <div class="sec-info"><h3>Custom Values</h3><p>Reusable variables in GHL — set once, flows into every template. Verify all are populated and being used correctly.</p></div>
+    </div>
+    <div class="cl" data-section="p3-customvalues">
+      <div class="cl-hdr"><span>Custom Value Checks</span><span class="cl-count">0 / 6</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Program Breakdown link custom value populated</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">"From Email" custom value populated</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">"From Name" custom value populated</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Webinar replay link custom value exists (points to w-1 page)</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Scheduler page link custom value exists (points to s-1 page)</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Workflows and templates use custom values — no hardcoded links or emails</div></label>
+    </div>
+  </div>
+
+  <!-- DOCS & DRIVE LINKS -->
+  <div class="section" id="p3-docs">
+    <div class="sec-hdr">
+      <div class="sec-letter t">N</div>
+      <div class="sec-info"><h3>Docs & Drive Links</h3><p>Create the email nurture flow doc and launch assets doc, then move both to the client's Drive.</p></div>
+    </div>
+    <div class="cl" data-section="p3-docs">
+      <div class="cl-hdr"><span>Document Setup</span><span class="cl-count">0 / 6</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Copy the <a href="https://docs.google.com/document/d/18GMEMvR7VH21cWjBVizSI_Mu6pI70JzYmUQrBV6A9vs/copy" target="_blank">Email Nurture Sequence Flow template</a><span class="why">Copy link — creates your own version automatically.</span></div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Customize by linking each workflow from the client's GHL sub-account</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Move completed nurture flow doc to the client's Google Drive folder</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Copy the <a href="https://docs.google.com/document/d/1nHRVnhxD7ud0DrlMxSO4mkN18XAWGQp035EnPPo1HoA/copy" target="_blank">Launch Assets template</a><span class="why">Copy link — creates your own version automatically.</span></div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Rename to <code>PractitionerLastName_Launch Assets</code> (e.g. Jimenez_Launch Assets) and fill in all links</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Move completed launch assets doc to the client's Google Drive folder</div></label>
+    </div>
+  </div>
+
+  <!-- NOTIFY -->
+  <div class="section" id="p3-notify">
+    <div class="sec-hdr">
+      <div class="sec-letter y">O</div>
+      <div class="sec-info"><h3>Notify Business Strategist</h3><p>Final handoff for this phase — let the strategist know it's ready to share with the client.</p></div>
+    </div>
+    <div class="cl" data-section="p3-notify">
+      <div class="cl-hdr"><span>Handoff</span><span class="cl-count">0 / 2</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Post in <strong>#rogers-hollow-hbai</strong> Slack channel to notify the Business Strategist</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Include the link to the Launch Assets doc in the Slack message</div></label>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- PHASE 4 — BI REVIEW                     -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="phase-divider p" id="phase4">
+    <div><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--p);margin-bottom:2px">Phase 4</div><div style="font-size:16px;font-weight:700">GHL Specialist Review</div></div>
+  </div>
+  <div class="callout"><strong>🎯 What this phase confirms:</strong> The entire client journey works end to end — not just that pages exist. Every backend system must be connected, verified, and confirmed before ads can run.</div>
+
+  <!-- DOMAINS -->
+  <div class="section" id="p4-domains">
+    <div class="sec-hdr">
+      <div class="sec-letter">P</div>
+      <div class="sec-info"><h3>Domains & URLs</h3><p>Correct domain connected; all slugs set; URLs documented in the ad launch spreadsheet.</p></div>
+    </div>
+    <div class="cl" data-section="p4-domains">
+      <div class="cl-hdr"><span>Domain Checks</span><span class="cl-count">0 / 5</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Domain connected correctly in GHL (Settings → Domains)</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Correct root domain or subdomain is being used</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">All page slugs are correct — no default names like "page-1" remaining</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">All funnel URLs load without errors</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">All funnel URLs added to the ad launch spreadsheet</div></label>
+    </div>
+  </div>
+
+  <!-- TRACKING -->
+  <div class="section" id="p4-tracking">
+    <div class="sec-hdr">
+      <div class="sec-letter y">Q</div>
+      <div class="sec-info"><h3>Pixel & Tracking</h3><p>Meta Pixel and Conversions API must fire the right events at opt-in, purchase, and booking.</p></div>
+    </div>
+    <div class="callout warn"><strong>⚠️ Note:</strong> Pixel ID and Access Token are added by Matt Stine. Your job is to verify they're in the right places and the automations reference them correctly.</div>
+    <div class="cl" data-section="p4-tracking">
+      <div class="cl-hdr"><span>Tracking Checks</span><span class="cl-count">0 / 8</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Pixel ID matches the ad launch questionnaire</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Pixel code placed in funnel settings (not just a single page)</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Pixel firing on every funnel page</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Conversions API automation: correct Pixel ID set</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Conversions API automation: correct Access Token set</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Lead event triggered by correct opt-in form submission</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Purchase event triggered by correct order form submission</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Schedule event triggered by correct calendar booking</div></label>
+    </div>
+  </div>
+
+  <!-- PAYMENT REVIEW -->
+  <div class="section" id="p4-payment">
+    <div class="sec-hdr">
+      <div class="sec-letter g">R</div>
+      <div class="sec-info"><h3>Payment Verification</h3><p>Confirm product, coupon, and billing setup are all correct before testing.</p></div>
+    </div>
+    <div class="cl" data-section="p4-payment">
+      <div class="cl-hdr"><span>Payment Checks</span><span class="cl-count">0 / 4</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Correct product attached to the order page — no errors in GHL products</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Coupon code works and test price calculates correctly after applying it</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Billing wallet has funds or auto-charge is enabled (for texts and emails)</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Calendar link custom value points to the scheduler page; meeting location is correct</div></label>
+    </div>
+  </div>
+
+  <!-- EMAIL SENDING -->
+  <div class="section" id="p4-email">
+    <div class="sec-hdr">
+      <div class="sec-letter">S</div>
+      <div class="sec-info"><h3>Email Sending Setup</h3><p>If the sending domain isn't configured, emails won't send or will land in spam.</p></div>
+    </div>
+    <div class="cl" data-section="p4-email">
+      <div class="cl-hdr"><span>Email Sending Checks</span><span class="cl-count">0 / 3</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Email sending domain connected in GHL; dedicated sending domain active (not shared)</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">"From Email" and "From Name" custom values populated</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Templates pull From Name/Email from custom values — not hardcoded</div></label>
+    </div>
+  </div>
+
+  <!-- SCOREAPP -->
+  <div class="section" id="p4-scoreapp">
+    <div class="sec-hdr">
+      <div class="sec-letter y">T</div>
+      <div class="sec-info"><h3>ScoreApp / Assessment</h3><p>If the funnel includes an assessment, confirm it's linked in the right email.</p></div>
+    </div>
+    <div class="cl" data-section="p4-scoreapp">
+      <div class="cl-hdr"><span>ScoreApp Checks</span><span class="cl-count">0 / 3</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Correct ScoreApp account and scorecard confirmed with the client</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Assessment link added to the consult purchase confirmation email</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Assessment link works and goes to the correct scorecard</div></label>
+    </div>
+  </div>
+
+  <!-- TEMPLATES -->
+  <div class="section" id="p4-templates">
+    <div class="sec-hdr">
+      <div class="sec-letter g">U</div>
+      <div class="sec-info"><h3>SMS & Email Templates</h3><p>Review all templates for accuracy. Wrong links, missing tokens, and placeholder text are the most common issues.</p></div>
+    </div>
+    <div class="callout warn"><strong>⚠️ Most common mistakes:</strong> Placeholder names left in copy ("CLIENT NAME"). Hardcoded links instead of custom values. Wrong calendar/reschedule links. Wrong time zone merge fields.</div>
+
+    <div class="blk">
+      <div class="blk-hdr" onclick="toggleBlk(this)"><span class="bicon">🔍</span><h4>Quality Checks — All Templates</h4><span class="btog">▾</span></div>
+      <div class="blk-body">
+        <div class="cl" data-section="p4-tmpl-quality">
+          <div class="cl-hdr"><span>Apply to Every Template</span><span class="cl-count">0 / 7</span></div>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Subject lines correct and not generic defaults</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">From name and from email correct (using custom values, not hardcoded)</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">All links inside templates correct and working</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Personalization tokens work (first name, etc.); offer name correct throughout</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">No placeholder text remaining in any template</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Time zone merge fields correct; meeting location appears correctly in appointment messages</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Email content matches the client's Email Sequence Architect doc in Google Drive</div></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-hdr" onclick="toggleBlk(this)"><span class="bicon">📋</span><h4>Required Templates — All Must Exist</h4><span class="btog">▾</span></div>
+      <div class="blk-body">
+        <div class="cl" data-section="p4-tmpl-exist">
+          <div class="cl-hdr"><span>Template Existence Checklist</span><span class="cl-count">0 / 9</span></div>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Appointment confirmation email</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">24-hour appointment reminder email</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">10-minute appointment reminder (email or SMS)</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Needs rescheduled SMS</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">No-show SMS</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Schedule your appointment SMS</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Webinar opt-in email sequence (5 emails, correctly timed)</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Consult purchase confirmation email (with assessment link)</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Bonus delivery email</div></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- PHASE 5 — GO-LIVE                       -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="phase-divider g" id="phase5">
+    <div><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--g);margin-bottom:2px">Phase 5</div><div style="font-size:16px;font-weight:700">Final Testing & Go-Live</div></div>
+  </div>
+
+  <div class="section" id="p5-testing">
+    <div class="sec-hdr">
+      <div class="sec-letter r">V</div>
+      <div class="sec-info"><h3>End-to-End Testing</h3><p>Test the entire journey before handing off for ads. Do not skip.</p></div>
+    </div>
+    <div class="callout danger"><strong>🚨 Do not skip.</strong> A funnel that looks built but hasn't been tested is not a ready funnel. Every step below must pass before ads can go live.</div>
+    <div class="cl" data-section="p5-testing">
+      <div class="cl-hdr"><span>Full Test Checklist</span><span class="cl-count">0 / 13</span></div>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Opt-in form submits successfully and navigates to the webinar page</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Webinar page loads; video plays correctly and does NOT autoplay</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Countdown timer works and shows CTA button when it expires</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Test order placed using payment processor test mode; coupon code applies correctly</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Appointment booking works on the scheduler page</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Confirmation email arrived; all links inside it work and go to the right pages</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">SMS messages arrived correctly</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Automation triggers fired correctly after test purchase</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Test contact moved through the correct workflow stages</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Purchase removed the contact from nurture workflows (no double-messaging)</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Pixel events fired correctly — verified in Meta Events Manager</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">All test data cleaned up after testing</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">URLs confirmed in ad launch spreadsheet; Pixel ID and Access Token confirmed with Matt Stine</div></label>
+    </div>
+
+    <div class="callout ok" style="margin-top:16px">
+      <strong>✅ Ready for ads when all phases are complete:</strong> Pages built and reviewed → launch assets done → domains and tracking live → payment and calendar confirmed → emails and texts correct → assessment linked → automations verified → full end-to-end test passed.
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+  // CHECKBOX
+  function handleCheck(cb) {
+    cb.closest('.ci').classList.toggle('checked', cb.checked);
+    updateCounts();
+  }
+
+  function updateCounts() {
+    let total = 0, done = 0;
+    document.querySelectorAll('.cl').forEach(cl => {
+      const all = cl.querySelectorAll('input[type=checkbox]');
+      const chk = cl.querySelectorAll('input[type=checkbox]:checked');
+      const el = cl.querySelector('.cl-count');
+      if (el) el.textContent = `${chk.length} / ${all.length}`;
+      total += all.length;
+      done += chk.length;
+    });
+    const pct = total ? Math.round(done / total * 100) : 0;
+    document.getElementById('progFill').style.width = pct + '%';
+    document.getElementById('progText').textContent = `${done} / ${total}`;
+    updateNavDone();
+  }
+
+  const navMap = {
+    'p1-readiness': ['p1-readiness'],
+    'p2-global': ['p2-global'],
+    'p2-landing': ['p2-landing'],
+    'p2-webinar': ['p2-vidalytics','p2-webinar-page'],
+    'p2-order': ['p2-order-offer','p2-order-product'],
+    'p2-retarget': ['p2-retarget'],
+    'p2-bonus': ['p2-bonus'],
+    'p2-scheduler': ['p2-scheduler'],
+    'p3-program': ['p3-program'],
+    'p3-agreement': ['p3-agreement'],
+    'p3-automations': ['p3-auto-agreement','p3-auto-funnel'],
+    'p3-forms': ['p3-forms'],
+    'p3-customvalues': ['p3-customvalues'],
+    'p3-docs': ['p3-docs'],
+    'p3-notify': ['p3-notify'],
+    'p4-domains': ['p4-domains'],
+    'p4-tracking': ['p4-tracking'],
+    'p4-payment': ['p4-payment'],
+    'p4-email': ['p4-email'],
+    'p4-scoreapp': ['p4-scoreapp'],
+    'p4-templates': ['p4-tmpl-quality','p4-tmpl-exist'],
+    'p5-testing': ['p5-testing'],
+  };
+
+  function updateNavDone() {
+    document.querySelectorAll('.nav-item').forEach(nav => {
+      const id = (nav.getAttribute('href') || '').replace('#','');
+      const sections = navMap[id];
+      if (!sections || !sections.length) return;
+      let allDone = true, hasAny = false;
+      sections.forEach(s => {
+        const cl = document.querySelector(`.cl[data-section="${s}"]`);
+        if (!cl) return;
+        const all = cl.querySelectorAll('input');
+        const chk = cl.querySelectorAll('input:checked');
+        if (all.length) hasAny = true;
+        if (chk.length < all.length) allDone = false;
+      });
+      nav.classList.toggle('done', hasAny && allDone);
+    });
+  }
+
+  function resetAll() {
+    if (!confirm('Reset all checkboxes? Your progress will be lost.')) return;
+    document.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      cb.checked = false;
+      cb.closest('.ci').classList.remove('checked');
+    });
+    updateCounts();
+  }
+
+  // COLLAPSIBLE BLOCKS
+  function toggleBlk(hdr) {
+    const body = hdr.nextElementSibling;
+    const hide = body.style.display !== 'none';
+    body.style.display = hide ? 'none' : '';
+    hdr.classList.toggle('collapsed', hide);
+  }
+
+  // ACTIVE NAV ON SCROLL
+  const allIds = Object.keys(navMap);
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    allIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top <= 110) cur = id;
+    });
+    document.querySelectorAll('.nav-item').forEach(nav => {
+      const id = (nav.getAttribute('href') || '').replace('#','');
+      nav.classList.toggle('active', id === cur && !nav.classList.contains('done'));
+    });
+  });
+
+  // NAV CLICK — smooth scroll
+  document.querySelectorAll('.nav-item').forEach(nav => {
+    nav.addEventListener('click', e => {
+      e.preventDefault();
+      const id = (nav.getAttribute('href') || '').replace('#','');
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  updateCounts();
+</script>
+</body>
+</html>
