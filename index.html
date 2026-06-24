@@ -357,7 +357,7 @@
           <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">5-minute countdown timer added — shows CTA button when it expires</div></label>
           <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Timer hides/shows correct sections at the right times</div></label>
           <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Text-only testimonials added, or section hidden if none provided</div></label>
-          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Page moves to the correct next step after the webinar</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Page CTA and next step leads to the <strong>Order Page</strong> (not the scheduler — the lead has watched but not purchased yet)</div></label>
         </div>
       </div>
     </div>
@@ -466,12 +466,13 @@ Thanks,
     </div>
     <div class="callout"><strong>📋 Use the Funnel Build Questionnaire</strong> for calendar details: availability, timezone, meeting duration, and location.</div>
     <div class="cl" data-section="p2-scheduler">
-      <div class="cl-hdr"><span>Scheduler Page Setup</span><span class="cl-count">0 / 7</span></div>
+      <div class="cl-hdr"><span>Scheduler Page Setup</span><span class="cl-count">0 / 8</span></div>
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Thank-you headline updated to match the product name</div></label>
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Calendar created and named using the custom value <code>{{custom_values.calendar_name}}</code></div></label>
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Custom value updated to the actual name of the call/assessment</div></label>
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Calendar set up as Round Robin<span class="why">Allows additional practitioners to be added easily later.</span></div></label>
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Calendar element added to page and newly created calendar attached</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">After booking, action is set to <strong>Go to URL</strong> → redirects to the client's ScoreApp assessment link<span class="why">This is what sends the lead to complete their assessment immediately after scheduling.</span></div></label>
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Meeting location set and confirmed correct</div></label>
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Offer name on scheduler matches the order page exactly</div></label>
     </div>
@@ -546,7 +547,7 @@ Thanks,
           <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Webinar opt-in source workflow</div></label>
           <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Webinar opt-in email sequence</div></label>
           <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">No-show follow-up sequence</div></label>
-          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Consult purchased workflow</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Consult purchased workflow<span class="why">Removal logic: when someone purchases, remove them from the <strong>webinar email sequence workflow only</strong> — not all workflows.</span></div></label>
           <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Consult scheduled workflow</div></label>
           <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Consult canceled workflow</div></label>
           <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Post-call workflow</div></label>
@@ -580,12 +581,14 @@ Thanks,
       <div class="sec-info"><h3>Custom Values</h3><p>Reusable variables in GHL — set once, flows into every template. Verify all are populated and being used correctly.</p></div>
     </div>
     <div class="cl" data-section="p3-customvalues">
-      <div class="cl-hdr"><span>Custom Value Checks</span><span class="cl-count">0 / 6</span></div>
+      <div class="cl-hdr"><span>Custom Value Checks</span><span class="cl-count">0 / 8</span></div>
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Program Breakdown link custom value populated</div></label>
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">"From Email" custom value populated</div></label>
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">"From Name" custom value populated</div></label>
-      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Webinar replay link custom value exists (points to w-1 page)</div></label>
-      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Scheduler page link custom value exists (points to s-1 page)</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Webinar replay link custom value exists and points to the w-1 page<span class="why">Used as the trigger link in webinar follow-up emails.</span></div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Order page link custom value created and points to the order page<span class="why">Used as the CTA/trigger link in webinar sequence emails — leads to purchase, not scheduling.</span></div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Scheduler / scheduling link custom value exists and points to the s-1 page<span class="why">Used in post-purchase emails and appointment-related messages.</span></div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">All trigger links and custom values in emails and texts are populated — webinar link, order page link, and scheduling link verified</div></label>
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Workflows and templates use custom values — no hardcoded links or emails</div></label>
     </div>
   </div>
@@ -743,7 +746,7 @@ Thanks,
           <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Needs rescheduled SMS</div></label>
           <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">No-show SMS</div></label>
           <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Schedule your appointment SMS</div></label>
-          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Webinar opt-in email sequence (5 emails, correctly timed)</div></label>
+          <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Webinar opt-in email sequence (5 emails, correctly timed)<span class="why">The CTA/button in these emails (e.g. "Book Now") must link to the <strong>Order Page</strong> — not the scheduler. The lead watched the webinar but hasn't purchased yet.</span></div></label>
           <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Consult purchase confirmation email (with assessment link)</div></label>
           <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Bonus delivery email</div></label>
         </div>
@@ -776,7 +779,7 @@ Thanks,
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">SMS messages arrived correctly</div></label>
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Automation triggers fired correctly after test purchase</div></label>
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Test contact moved through the correct workflow stages</div></label>
-      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Purchase removed the contact from nurture workflows (no double-messaging)</div></label>
+      <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Purchase removed the contact from the webinar email sequence workflow (not all workflows)</div></label>
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">Pixel events fired correctly — verified in Meta Events Manager</div></label>
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">All test data cleaned up after testing</div></label>
       <label class="ci"><input type="checkbox" onchange="handleCheck(this)"><div class="ci-text">URLs confirmed in ad launch spreadsheet; Pixel ID and Access Token confirmed with Matt Stine</div></label>
